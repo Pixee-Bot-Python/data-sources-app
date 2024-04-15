@@ -11,7 +11,7 @@ def user_check_email(cursor: PgCursor, email: str) -> Dict[str, str]:
     :param email: The email address to check against the users in the database.
     :return: A dictionary with the user's ID if found, otherwise an error message.
     """
-    cursor.execute(f"select id from users where email = '{email}'")
+    cursor.execute("select id from users where email = ?", (email, ))
     results = cursor.fetchall()
     if len(results) > 0:
         user_data = {"id": results[0][0]}

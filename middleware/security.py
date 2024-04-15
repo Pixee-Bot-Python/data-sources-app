@@ -24,7 +24,7 @@ def is_valid(api_key: str, endpoint: str, method: str) -> Tuple[bool, bool]:
 
     psycopg2_connection = initialize_psycopg2_connection()
     cursor = psycopg2_connection.cursor()
-    cursor.execute(f"select id, api_key, role from users where api_key = '{api_key}'")
+    cursor.execute("select id, api_key, role from users where api_key = ?", (api_key, ))
     results = cursor.fetchall()
     if len(results) > 0:
         role = results[0][2]

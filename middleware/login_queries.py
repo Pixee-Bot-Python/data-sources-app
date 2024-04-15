@@ -14,8 +14,8 @@ def login_results(cursor: PgCursor, email: str) -> Dict[str, Union[int, str]]:
     :return: A dictionary containing user data or an error message.
     """
     cursor.execute(
-        f"select id, password_digest, api_key from users where email = '{email}'"
-    )
+        "select id, password_digest, api_key from users where email = ?", 
+    (email, ))
     results = cursor.fetchall()
     if len(results) > 0:
         user_data = {

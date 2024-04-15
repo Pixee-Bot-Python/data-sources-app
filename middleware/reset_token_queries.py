@@ -11,8 +11,8 @@ def check_reset_token(cursor: PgCursor, token: str) -> Dict[str, Union[int, str]
     :return: A dictionary containing the user's ID, token creation date, and email if the token exists; otherwise, an error message.
     """
     cursor.execute(
-        f"select id, create_date, email from reset_tokens where token = '{token}'"
-    )
+        "select id, create_date, email from reset_tokens where token = ?", 
+    (token, ))
     results = cursor.fetchall()
     if len(results) > 0:
         user_data = {
