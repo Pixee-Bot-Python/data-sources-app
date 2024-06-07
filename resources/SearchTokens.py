@@ -61,7 +61,7 @@ class SearchTokens(Resource):
             token = uuid.uuid4().hex
             expiration = datetime.datetime.now() + datetime.timedelta(minutes=5)
             cursor.execute(
-                f"insert into access_tokens (token, expiration_date) values (%s, %s)",
+                "insert into access_tokens (token, expiration_date) values (%s, %s)",
                 (token, expiration),
             )
             self.psycopg2_connection.commit()
