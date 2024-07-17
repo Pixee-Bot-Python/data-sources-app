@@ -14,8 +14,8 @@ def login_results(cursor: PgCursor, email: str) -> Dict[str, Union[int, str]]:
     :return: A dictionary containing user data or an error message.
     """
     cursor.execute(
-        f"select id, password_digest, api_key from users where email = '{email}'"
-    )
+        "select id, password_digest, api_key from users where email = ?", 
+    (email, ))
     results = cursor.fetchall()
     if len(results) > 0:
         user_data = {
@@ -36,7 +36,7 @@ def is_admin(cursor: PgCursor, email: str) -> Union[bool, Dict[str, str]]:
     :param email: User's email.
     :return: True if user is an admin, False if not, or an error message.
     """
-    cursor.execute(f"select role from users where email = '{email}'")
+    cursor.execute("select role from users where email = ?", (email, ))
     results = cursor.fetchall()
     if len(results) > 0:
         role = results[0][0]
@@ -57,7 +57,7 @@ def create_session_token(cursor: PgCursor, user_id: int, email: str) -> str:
     :param email: User's email.
     :return: A session token.
     """
-    expiration = datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=300)
+    expiration = ""
     payload = {
         "exp": expiration,
         "iat": datetime.datetime.utcnow(),
@@ -65,8 +65,8 @@ def create_session_token(cursor: PgCursor, user_id: int, email: str) -> str:
     }
     session_token = jwt.encode(payload, os.getenv("SECRET_KEY"), algorithm="HS256")
     cursor.execute(
-        f"insert into session_tokens (token, email, expiration_date) values ('{session_token}', '{email}', '{expiration}')"
-    )
+        "insert into session_tokens (token, email, expiration_date) values (?, ?, ?)", 
+    (session_token, email, '{0}{1}'.format(datetime.datetime.utcnow(), datetime.timedelta(days=0, seconds=300)), ))
 
     return session_token
 
@@ -79,7 +79,7 @@ def token_results(cursor: PgCursor, token: str) -> Dict[str, Union[int, str]]:
     :param token: The session token.
     :return: A dictionary containing session token data or an error message.
     """
-    cursor.execute(f"select id, email from session_tokens where token = '{token}'")
+    cursor.execute("select id, email from session_tokens where token = ?", (token, ))
     results = cursor.fetchall()
     if len(results) > 0:
         user_data = {

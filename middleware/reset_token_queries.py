@@ -11,8 +11,8 @@ def check_reset_token(cursor: PgCursor, token: str) -> Dict[str, Union[int, str]
     :return: A dictionary containing the user's ID, token creation date, and email if the token exists; otherwise, an error message.
     """
     cursor.execute(
-        f"select id, create_date, email from reset_tokens where token = '{token}'"
-    )
+        "select id, create_date, email from reset_tokens where token = ?", 
+    (token, ))
     results = cursor.fetchall()
     if len(results) > 0:
         user_data = {
@@ -34,8 +34,8 @@ def add_reset_token(cursor: PgCursor, email: str, token: str) -> None:
     :param token: The reset token to add.
     """
     cursor.execute(
-        f"insert into reset_tokens (email, token) values ('{email}', '{token}')"
-    )
+        "insert into reset_tokens (email, token) values (?, ?)", 
+    (email, token, ))
 
     return
 
@@ -49,7 +49,7 @@ def delete_reset_token(cursor: PgCursor, email: str, token: str) -> None:
     :param token: The reset token to delete.
     """
     cursor.execute(
-        f"delete from reset_tokens where email = '{email}' and token = '{token}'"
-    )
+        "delete from reset_tokens where email = ? and token = ?", 
+    (email, token, ))
 
     return

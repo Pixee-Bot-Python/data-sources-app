@@ -120,8 +120,8 @@ def session():
         # valid_row = {k: v for k, v in row.items() if k in all_columns}
         # clean_row = [r if r is not None else "" for r in row]
         fully_clean_row = [str(r) for r in row]
-        fully_clean_row_str = "'" + "', '".join(fully_clean_row) + "'"
-        db_session.execute(f"insert into data_sources values ({fully_clean_row_str})")
+        fully_clean_row_str = "?"
+        db_session.execute(f"insert into data_sources values ({fully_clean_row_str})", ("', '".join(fully_clean_row), ))
     db_session.execute(
         "update data_sources set broken_source_url_as_of = null where broken_source_url_as_of = 'NULL'"
     )
@@ -194,7 +194,7 @@ def test_user_post_query(session):
     user_post_results(curs, "unit_test", "unit_test")
 
     email_check = curs.execute(
-        f"SELECT email FROM users WHERE email = 'unit_test'"
+        "SELECT email FROM users WHERE email = 'unit_test'"
     ).fetchone()[0]
 
     assert email_check == "unit_test"
@@ -252,7 +252,7 @@ def test_add_reset_token(session):
     add_reset_token(curs, "unit_test", "unit_test")
 
     email_check = curs.execute(
-        f"SELECT email FROM reset_tokens WHERE email = 'unit_test'"
+        "SELECT email FROM reset_tokens WHERE email = 'unit_test'"
     ).fetchone()[0]
 
     assert email_check == "unit_test"
@@ -263,7 +263,7 @@ def test_delete_reset_token(session):
     delete_reset_token(curs, "test", "test")
 
     email_check = curs.execute(
-        f"SELECT email FROM reset_tokens WHERE email = 'test'"
+        "SELECT email FROM reset_tokens WHERE email = 'test'"
     ).fetchone()
 
     assert not email_check
@@ -284,7 +284,7 @@ def test_archives_put_broken_as_of(session):
     )
     curs = session.cursor()
     broken_check, last_check = curs.execute(
-        f"SELECT broken_source_url_as_of, last_cached FROM data_sources WHERE airtable_uid = 'rec00T2YLS2jU7Tbn'"
+        "SELECT broken_source_url_as_of, last_cached FROM data_sources WHERE airtable_uid = 'rec00T2YLS2jU7Tbn'"
     ).fetchone()
 
     assert broken_check == DATETIME_STRING
@@ -297,7 +297,7 @@ def test_archives_put_last_cached(session):
     )
     curs = session.cursor()
     last_check = curs.execute(
-        f"SELECT last_cached FROM data_sources WHERE airtable_uid = 'recUGIoPQbJ6laBmr'"
+        "SELECT last_cached FROM data_sources WHERE airtable_uid = 'recUGIoPQbJ6laBmr'"
     ).fetchone()[0]
 
     assert last_check == DATETIME_STRING
