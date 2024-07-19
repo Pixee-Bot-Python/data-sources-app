@@ -34,8 +34,8 @@ class RefreshSession(Resource):
             cursor = self.psycopg2_connection.cursor()
             user_data = token_results(cursor, old_token)
             cursor.execute(
-                f"delete from session_tokens where token = '{old_token}' and expiration_date < '{dt.utcnow()}'"
-            )
+                "delete from session_tokens where token = ? and expiration_date < ?", 
+            (old_token, dt.utcnow(), ))
             self.psycopg2_connection.commit()
 
             if "id" in user_data:

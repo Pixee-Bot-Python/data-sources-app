@@ -24,15 +24,15 @@ def is_valid(api_key: str, endpoint: str, method: str) -> Tuple[bool, bool]:
 
     psycopg2_connection = initialize_psycopg2_connection()
     cursor = psycopg2_connection.cursor()
-    cursor.execute(f"select id, api_key, role from users where api_key = '{api_key}'")
+    cursor.execute("select id, api_key, role from users where api_key = ?", (api_key, ))
     results = cursor.fetchall()
     if len(results) > 0:
         role = results[0][2]
 
     if not results:
         cursor.execute(
-            f"select email, expiration_date from session_tokens where token = '{api_key}'"
-        )
+            "select email, expiration_date from session_tokens where token = ?", 
+        (api_key, ))
         results = cursor.fetchall()
         if len(results) > 0:
             email = results[0][0]
@@ -46,11 +46,11 @@ def is_valid(api_key: str, endpoint: str, method: str) -> Tuple[bool, bool]:
                 role = "admin"
 
     if not results:
-        cursor.execute(f"select id, token from access_tokens where token = '{api_key}'")
+        cursor.execute("select id, token from access_tokens where token = ?", (api_key, ))
         results = cursor.fetchall()
         cursor.execute(
-            f"delete from access_tokens where expiration_date < '{dt.utcnow()}'"
-        )
+            "delete from access_tokens where expiration_date < ?", 
+        (dt.utcnow(), ))
         psycopg2_connection.commit()
         role = "user"
 
