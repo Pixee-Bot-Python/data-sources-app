@@ -2,6 +2,7 @@ import os
 import datetime
 import json
 import requests
+from security import safe_requests
 
 API_KEY = os.getenv("VUE_APP_PDAP_API_KEY")
 BASE_URL = os.getenv("VITE_VUE_API_BASE_URL")
@@ -10,7 +11,7 @@ HEADERS = {"Authorization": f"Bearer {API_KEY}"}
 
 # quick-search
 def test_quicksearch_officer_involved_shootings_philadelphia_results():
-    response = requests.get(
+    response = safe_requests.get(
         f"{BASE_URL}/quick-search/Officer Involved Shootings/philadelphia",
         headers=HEADERS,
         json={"test_flag": True},
@@ -20,7 +21,7 @@ def test_quicksearch_officer_involved_shootings_philadelphia_results():
 
 
 def test_quicksearch_officer_involved_shootings_lowercase_philadelphia_results():
-    response = requests.get(
+    response = safe_requests.get(
         f"{BASE_URL}/quick-search/officer involved shootings/Philadelphia",
         headers=HEADERS,
         json={"test_flag": True},
@@ -30,7 +31,7 @@ def test_quicksearch_officer_involved_shootings_lowercase_philadelphia_results()
 
 
 def test_quicksearch_officer_involved_shootings_philadelphia_county_results():
-    response = requests.get(
+    response = safe_requests.get(
         f"{BASE_URL}/quick-search/Officer Involved Shootings/philadelphia county",
         headers=HEADERS,
         json={"test_flag": True},
@@ -40,7 +41,7 @@ def test_quicksearch_officer_involved_shootings_philadelphia_county_results():
 
 
 def test_quicksearch_all_allgeheny_results():
-    response = requests.get(
+    response = safe_requests.get(
         f"{BASE_URL}/quick-search/all/allegheny",
         headers=HEADERS,
         json={"test_flag": True},
@@ -50,7 +51,7 @@ def test_quicksearch_all_allgeheny_results():
 
 
 def test_quicksearch_complaints_all_results():
-    response = requests.get(
+    response = safe_requests.get(
         f"{BASE_URL}/quick-search/complaints/all",
         headers=HEADERS,
         json={"test_flag": True},
@@ -60,7 +61,7 @@ def test_quicksearch_complaints_all_results():
 
 
 def test_quicksearch_media_bulletin_pennsylvania_results():
-    response = requests.get(
+    response = safe_requests.get(
         f"{BASE_URL}/quick-search/media bulletin/pennsylvania",
         headers=HEADERS,
         json={"test_flag": True},
@@ -71,7 +72,7 @@ def test_quicksearch_media_bulletin_pennsylvania_results():
 
 # data-sources
 def test_data_source_by_id():
-    response = requests.get(
+    response = safe_requests.get(
         f"{BASE_URL}/data-sources-by-id/reczwxaH31Wf9gRjS",
         headers=HEADERS,
     timeout=60)
@@ -80,7 +81,7 @@ def test_data_source_by_id():
 
 
 def test_data_sources():
-    response = requests.get(f"{BASE_URL}/data-sources", headers=HEADERS, timeout=60)
+    response = safe_requests.get(f"{BASE_URL}/data-sources", headers=HEADERS, timeout=60)
 
     return len(response.json()["data"]) > 0
 
@@ -106,7 +107,7 @@ def test_update_data_source():
 
 
 def test_data_sources_approved():
-    response = requests.get(f"{BASE_URL}/data-sources", headers=HEADERS, timeout=60)
+    response = safe_requests.get(f"{BASE_URL}/data-sources", headers=HEADERS, timeout=60)
     unapproved_url = "https://joinstatepolice.ny.gov/15-mile-run"
 
     return (
@@ -116,7 +117,7 @@ def test_data_sources_approved():
 
 
 def test_data_source_by_id_approved():
-    response = requests.get(
+    response = safe_requests.get(
         f"{BASE_URL}/data-sources-by-id/rec013MFNfBnrTpZj",
         headers=HEADERS,
     timeout=60)
@@ -125,20 +126,20 @@ def test_data_source_by_id_approved():
 
 
 def test_data_sources_map():
-    response = requests.get(f"{BASE_URL}/data-sources-map", headers=HEADERS, timeout=60)
+    response = safe_requests.get(f"{BASE_URL}/data-sources-map", headers=HEADERS, timeout=60)
 
     return len(response.json()["data"]) > 0
 
 
 # search-tokens
 def test_search_tokens_data_sources():
-    response = requests.get(f"{BASE_URL}/search-tokens?endpoint=data-sources", timeout=60)
+    response = safe_requests.get(f"{BASE_URL}/search-tokens?endpoint=data-sources", timeout=60)
 
     return len(response.json()["data"]) > 0
 
 
 def test_search_tokens_data_source_by_id():
-    response = requests.get(
+    response = safe_requests.get(
         f"{BASE_URL}/search-tokens?endpoint=data-sources-by-id&arg1=reczwxaH31Wf9gRjS", 
     timeout=60)
 
@@ -146,7 +147,7 @@ def test_search_tokens_data_source_by_id():
 
 
 def test_search_tokens_quick_search_complaints_allegheny_results():
-    response = requests.get(
+    response = safe_requests.get(
         f"{BASE_URL}/search-tokens?endpoint=quick-search&arg1=complaints&arg2=allegheny",
         json={"test_flag": True},
     timeout=60)
@@ -225,7 +226,7 @@ def test_reset_token_validation():
 
 # api-key
 def test_get_api_key():
-    response = requests.get(
+    response = safe_requests.get(
         f"{BASE_URL}/api_key",
         headers=HEADERS,
         json={"email": "test2", "password": "test"},
@@ -236,7 +237,7 @@ def test_get_api_key():
 
 # archives
 def test_get_archives():
-    response = requests.get(f"{BASE_URL}/archives", headers=HEADERS, timeout=60)
+    response = safe_requests.get(f"{BASE_URL}/archives", headers=HEADERS, timeout=60)
 
     return len(response.json()[0]) > 0
 
@@ -279,14 +280,14 @@ def test_put_archives_brokenasof():
 
 # agencies
 def test_agencies():
-    response = requests.get(f"{BASE_URL}/agencies/1", headers=HEADERS, timeout=60)
+    response = safe_requests.get(f"{BASE_URL}/agencies/1", headers=HEADERS, timeout=60)
 
     return len(response.json()["data"]) > 0
 
 
 def test_agencies_pagination():
-    response1 = requests.get(f"{BASE_URL}/agencies/1", headers=HEADERS, timeout=60)
-    response2 = requests.get(f"{BASE_URL}/agencies/2", headers=HEADERS, timeout=60)
+    response1 = safe_requests.get(f"{BASE_URL}/agencies/1", headers=HEADERS, timeout=60)
+    response2 = safe_requests.get(f"{BASE_URL}/agencies/2", headers=HEADERS, timeout=60)
 
     return response1 != response2
 
